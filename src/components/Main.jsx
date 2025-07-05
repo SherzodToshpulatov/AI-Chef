@@ -1,41 +1,52 @@
-import React from 'react'
-import CloudeRecipe from './CloudeRecipe'
-import IngredientsList from './IngredientsList'
-import { getRecipeFromMistral } from '../ai'
+import React from "react"
+import IngredientsList from "./IngredientsList"
+import CloudeRecipe from "./CloudeRecipe"
+import {getRecipeFromMistral } from "../ai"
 
-export default function Main(){
-    const [ingredients, setingredients] = React.useState([])
-
+export default function Main() {
+    const [ingredients, setIngredients] = React.useState(
+        ["chicken", "all the main spices", "corn", "heavy cream", "pasta"]
+    )
     const [recipe, setRecipe] = React.useState("")
-
+    const recipeSection = React.useRef(null)
+    
+    React.useEffect(() => {
+        if (recipe !== "" && recipeSection.current !== null) {
+            recipeSection.current.scrollIntoView({behavior: "smooth"})
+        }
+    }, [recipe])
 
     async function getRecipe() {
-        const generatedRecipe = await getRecipeFromMistral(ingredients)
-        setRecipe(generatedRecipe)
+        const recipeMarkdown = await getRecipeFromMistral(ingredients)
+        setRecipe(recipeMarkdown)
     }
 
-    function handleSubmit(formData){
-     
+    function addIngredient(formData) {
         const newIngredient = formData.get("ingredient")
-        setingredients(prevIngredients => [...prevIngredients,newIngredient])
-        
+        setIngredients(prevIngredients => [...prevIngredients, newIngredient])
     }
-  
-
-
-    return(
+    
+    return (
         <main>
-            <form action={handleSubmit} className="add-ingredient-form">
-                <input type="text"
-                placeholder="e.g. tomato"
-                aria-label="Add ingredient"
-                name = "ingredient"
-                 />
-                
-                <button >Add ingredient</button>
+            <form action={addIngredient} className="add-ingredient-form">
+                <input
+                    type="text"
+                    placeholder="e.g. tomato"
+                    aria-label="Add ingredient"
+                    name="ingredient"
+                />
+                <button>Add ingredient</button>
             </form>
-            {ingredients.length>0 && <IngredientsList ingredients = {ingredients} getRecipe={getRecipe}/>}
-            {recipe && <CloudeRecipe markdown={recipe}/>}
+
+            {ingredients.length > 0 &&
+                <IngredientsList
+                    ref={recipeSection}
+                    ingredients={ingredients}
+                    getRecipe={getRecipe}
+                />
+            }
+
+            {recipe && <CloudeRecipe markdown={recipe} />}
         </main>
     )
 }
