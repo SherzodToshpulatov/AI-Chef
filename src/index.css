@@ -107,3 +107,7 @@ ul.ingredients-list > li {
     font-size: 0.875rem;
     cursor: pointer;
 }
+
+.suggested-recipe-container{
+    max-width: 80%;
+}
